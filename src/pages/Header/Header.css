@@ -1,0 +1,78 @@
+/* Municipal Header Styling */
+.gov-header {
+    background-color: #1a1a1a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.gov-header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gov-logo-block {
+    display: flex;
+    align-items: center;
+}
+
+.gov-logo-link {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.gov-logo-text {
+    color: #ffffff;
+}
+
+.gov-logo-text::before {
+    content: "Hamro";
+    color: #008751;
+    /* Emerald Green theme accent */
+}
+
+.gov-nav-links {
+    display: flex;
+    gap: 1.8rem;
+}
+
+.gov-nav-links .nav-item {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.gov-nav-links .nav-item:hover,
+.gov-nav-links .nav-item.active {
+    color: #008751;
+}
+
+.gov-header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.btn-header-action {
+    background-color: #008751;
+    color: #ffffff;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn-header-action:hover {
+    background-color: #006c40;
+}
