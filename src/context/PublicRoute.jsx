@@ -1,27 +1,67 @@
+
 "use client";
 
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React from "react";
+import {
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+
+import { useAuth } from "./AuthContext";
 
 const PublicRoute = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
-
-  // Extract role checking both uppercase 'Role' and lowercase 'role'
-  const role = (user?.Role || user?.role || "").toLowerCase();
-
-  // Redirect authenticated users to their dashboard based on backend roles safely
-  if (role === "admin" || role === "organizer" || role === "employee") {
-    return <Navigate to="/dashboard" replace />;
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  if (role === "citizen" || role === "user") {
-    return <Navigate to="/user-dashboard" replace />;
+  // Not logged in → allow access to public pages
+  if (!user) {
+    return <Outlet />;
   }
 
-  // Allow unauthenticated guests to view public routes
+  const role = (
+    user.role ||
+    user.Role ||
+    ""
+  )
+    .toString()
+    .trim()
+    .toLowerCase();
+
+  console.log(
+    "PublicRoute detected role:",
+    role
+  );
+
+  // Backend roles
+  if (role === "admin" || role === "pharmacy") {
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
+  }
+
+  if (role === "patient") {
+    return (
+      <Navigate
+        to="/user-dashboard"
+        replace
+      />
+    );
+  }
+
+  // Unknown role
+  console.error(
+    "PublicRoute received unknown role:",
+    user
+  );
+
   return <Outlet />;
 };
 
 export default PublicRoute;
+

@@ -1,25 +1,70 @@
+
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import axiosInstance, { markLoggedOut, resetLogoutState } from "../axiosInstance";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
+
+import axiosInstance, {
+  markLoggedOut,
+  resetLogoutState,
+} from "../axiosInstance";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const hasFetchedUser = useRef(false);
 
-  // Fetch current logged-in user and normalize role to lowercase
+  // ==========================================
+  // GET CURRENT USER
+  // ==========================================
   const fetchUser = async () => {
     try {
-      const res = await axiosInstance.get("/accounts/me/");
-      const rawRole = res.data.role || res.data.Role || "user";
-      const normalizedUser = { ...res.data, role: rawRole.toString().toLowerCase() };
+      console.log("Fetching current user...");
+
+      const response = await axiosInstance.get(
+        "/accounts/me/"
+      );
+
+      console.log("ME RESPONSE:", response.data);
+
+      const rawRole =
+        response.data?.role ||
+        response.data?.Role ||
+        "";
+
+      const normalizedUser = {
+        ...response.data,
+        role: rawRole
+          .toString()
+          .trim()
+          .toLowerCase(),
+      };
+
+      console.log(
+        "NORMALIZED USER:",
+        normalizedUser
+      );
+
       setUser(normalizedUser);
+
       return normalizedUser;
-    } catch (err) {
+    } catch (error) {
+      console.error(
+        "FETCH USER ERROR:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+
       setUser(null);
+
       return null;
     } finally {
       setLoading(false);
@@ -27,44 +72,121 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Always check auth on app load
+  // ==========================================
+  // INITIAL AUTH CHECK
+  // ==========================================
   useEffect(() => {
     if (!hasFetchedUser.current) {
       fetchUser();
     }
   }, []);
 
+  // ==========================================
   // LOGIN
+  // ==========================================
   const login = async (email, password) => {
     try {
-      resetLogoutState(); // Clear the lock out flag before attempting to log in
-      await axiosInstance.post("/accounts/login/", { email, password });
+      console.log("Attempting login:", email);
+
+      resetLogoutState();
+
+      const response = await axiosInstance.post(
+        "/accounts/login/",
+        {
+          email,
+          password,
+        }
+      );
+
+      console.log(
+        "LOGIN API RESPONSE:",
+        response.data
+      );
+
+      // IMPORTANT:
+      // Backend puts JWT into HttpOnly cookies.
+      // We then ask /me/ who logged in.
       const loggedInUser = await fetchUser();
-      return { success: true, user: loggedInUser };
-    } catch (err) {
-      return { success: false, error: err.response?.data?.detail || "Login failed" };
+
+      if (!loggedInUser) {
+        return {
+          success: false,
+          error:
+            "Login succeeded, but the server did not return the current user.",
+        };
+      }
+
+      return {
+        success: true,
+        user: loggedInUser,
+        data: response.data,
+      };
+    } catch (error) {
+      console.error(
+        "LOGIN API ERROR:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+
+      return {
+        success: false,
+        error:
+          error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Login failed",
+      };
     }
   };
 
+  // ==========================================
   // LOGOUT
+  // ==========================================
   const logout = async () => {
     try {
-      await axiosInstance.post("/accounts/logout/");
-    } catch (err) {
-      console.error("Logout error:", err);
+      await axiosInstance.post(
+        "/accounts/logout/"
+      );
+    } catch (error) {
+      console.error(
+        "Logout error:",
+        error.response?.data || error.message
+      );
     } finally {
       markLoggedOut();
+
       setUser(null);
+
       hasFetchedUser.current = true;
+
       window.location.href = "/login";
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated: !!user,
+        login,
+        logout,
+        fetchUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuth must be used inside AuthProvider"
+    );
+  }
+
+  return context;
+};
+

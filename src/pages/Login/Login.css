@@ -1,19 +1,19 @@
+
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap");
 
-:root {
+.login-page {
     --login-ink: #143c2c;
     --login-muted: #718178;
     --login-green: #0d7a59;
     --login-bright: #b9f35c;
     --login-paper: #f7faf4;
     --login-line: #dce7de;
-}
 
-.login-page {
     min-height: 100vh;
     width: 100%;
     display: flex;
     overflow: hidden;
+    box-sizing: border-box;
     background: var(--login-paper);
     color: var(--login-ink);
     font-family:
@@ -24,16 +24,29 @@
         sans-serif;
 }
 
+.login-page *,
+.login-page *::before,
+.login-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================
+   LEFT SIDE
+========================= */
+
 .login-left {
     flex: 0 0 48%;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 56px clamp(28px, 7vw, 112px);
     background:
-        radial-gradient(circle at 0 0,
+        radial-gradient(
+            circle at 0 0,
             rgba(185, 243, 92, 0.17),
-            transparent 32%),
+            transparent 32%
+        ),
         var(--login-paper);
 }
 
@@ -53,16 +66,20 @@
 .login-logo {
     display: grid;
     place-items: center;
+    flex: 0 0 40px;
     width: 40px;
     height: 40px;
     border-radius: 11px;
     color: #ffffff;
-    background: linear-gradient(145deg, #1cae70 0%, #079459 100%);
-    box-shadow: 0 7px 16px rgba(13, 122, 89, 0.23);
-    font-family: "DM Sans", sans-serif;
+    background: linear-gradient(
+        145deg,
+        #1cae70 0%,
+        #079459 100%
+    );
+    box-shadow:
+        0 7px 16px rgba(13, 122, 89, 0.23);
     font-size: 16px;
     font-weight: 700;
-    letter-spacing: -1px;
     transition:
         transform 0.25s ease,
         box-shadow 0.25s ease;
@@ -70,16 +87,24 @@
 
 .login-brand:hover .login-logo {
     transform: rotate(-7deg) translateY(-2px);
-    box-shadow: 0 12px 26px rgba(60, 117, 57, 0.26);
+    box-shadow:
+        0 12px 26px rgba(60, 117, 57, 0.26);
 }
 
 .login-brand-name {
     margin: 0;
     color: #56655f;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
+}
+
+.login-brand-name span {
+    color: var(--login-green);
 }
 
 .login-heading {
@@ -98,7 +123,10 @@
 .login-title {
     margin: 0 0 12px;
     color: var(--login-ink);
-    font-family: "Playfair Display", Georgia, serif;
+    font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
     font-size: clamp(34px, 3.2vw, 48px);
     font-weight: 700;
     letter-spacing: -1.8px;
@@ -113,8 +141,16 @@
     line-height: 1.7;
 }
 
+/* =========================
+   FORM
+========================= */
+
 .login-form .ant-form-item {
     margin-bottom: 20px;
+}
+
+.login-form .ant-form-item-label {
+    padding-bottom: 0;
 }
 
 .login-form .ant-form-item-explain-error {
@@ -132,6 +168,7 @@
 }
 
 .login-input.ant-input-affix-wrapper {
+    width: 100%;
     height: 52px;
     padding: 0 15px;
     border: 1px solid var(--login-line);
@@ -152,7 +189,8 @@
 .login-input.ant-input-affix-wrapper-focused,
 .login-input.ant-input-affix-wrapper:focus-within {
     border-color: var(--login-green);
-    box-shadow: 0 0 0 4px rgba(13, 122, 89, 0.1);
+    box-shadow:
+        0 0 0 4px rgba(13, 122, 89, 0.1);
     transform: translateY(-1px);
 }
 
@@ -172,10 +210,15 @@
     font-size: 16px;
 }
 
+/* =========================
+   OPTIONS
+========================= */
+
 .login-options {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 15px;
     margin: 3px 0 26px;
 }
 
@@ -204,13 +247,19 @@
     text-decoration: underline;
 }
 
+/* =========================
+   BUTTON
+========================= */
+
 .login-submit-btn.ant-btn {
+    width: 100%;
     height: 53px;
     border: 0;
     border-radius: 12px;
     color: #173725;
     background: var(--login-bright);
-    box-shadow: 0 10px 22px rgba(118, 173, 66, 0.2);
+    box-shadow:
+        0 10px 22px rgba(118, 173, 66, 0.2);
     font-size: 14px;
     font-weight: 700;
     transition:
@@ -221,9 +270,10 @@
 
 .login-submit-btn.ant-btn:hover,
 .login-submit-btn.ant-btn:focus {
-    color: #173725;
-    background: #c9fb78;
-    box-shadow: 0 14px 28px rgba(118, 173, 66, 0.3);
+    color: #173725 !important;
+    background: #c9fb78 !important;
+    box-shadow:
+        0 14px 28px rgba(118, 173, 66, 0.3);
     transform: translateY(-2px);
 }
 
@@ -247,9 +297,14 @@
     font-size: 12px;
 }
 
+/* =========================
+   RIGHT SIDE / HERO
+========================= */
+
 .login-right {
     position: relative;
     flex: 1 1 52%;
+    min-width: 0;
     min-height: 100vh;
     overflow: hidden;
     isolation: isolate;
@@ -280,11 +335,18 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    pointer-events: none;
     background:
-        linear-gradient(180deg,
+        linear-gradient(
+            180deg,
             rgba(10, 42, 30, 0.04) 25%,
-            rgba(8, 45, 31, 0.86) 100%),
-        linear-gradient(90deg, rgba(4, 35, 24, 0.08), transparent 65%);
+            rgba(8, 45, 31, 0.86) 100%
+        ),
+        linear-gradient(
+            90deg,
+            rgba(4, 35, 24, 0.08),
+            transparent 65%
+        );
 }
 
 .login-image-content {
@@ -312,9 +374,11 @@
 .login-live-dot {
     width: 7px;
     height: 7px;
+    flex: 0 0 7px;
     border-radius: 50%;
     background: var(--login-bright);
-    box-shadow: 0 0 0 5px rgba(185, 243, 92, 0.16);
+    box-shadow:
+        0 0 0 5px rgba(185, 243, 92, 0.16);
     animation: login-pulse 1.8s infinite;
 }
 
@@ -322,12 +386,14 @@
     max-width: 610px;
     margin: 0 0 13px;
     color: #ffffff;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
     font-size: clamp(32px, 4.1vw, 61px);
     font-weight: 700;
     letter-spacing: -1.7px;
     line-height: 1.04;
-    text-wrap: balance;
 }
 
 .login-image-text {
@@ -340,7 +406,7 @@
 
 .login-image-footer {
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 24px;
 }
@@ -407,6 +473,10 @@
     background: var(--login-bright);
 }
 
+/* =========================
+   ANIMATIONS
+========================= */
+
 @keyframes login-fade-up {
     from {
         opacity: 0;
@@ -420,7 +490,6 @@
 }
 
 @keyframes login-pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -431,9 +500,14 @@
     }
 }
 
+/* =========================
+   TABLET
+========================= */
+
 @media (max-width: 900px) {
     .login-page {
         flex-direction: column;
+        overflow: auto;
     }
 
     .login-right {
@@ -455,6 +529,10 @@
     }
 }
 
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 560px) {
     .login-right {
         min-height: 390px;
@@ -465,14 +543,13 @@
     }
 
     .login-image-footer {
-        align-items: start;
+        align-items: flex-start;
         flex-direction: column;
     }
 
     .login-image-stats {
         width: 100%;
         justify-content: space-between;
-        box-sizing: border-box;
     }
 
     .login-story-dots {
@@ -486,10 +563,17 @@
     .login-left {
         padding: 38px 22px 52px;
     }
+
+    .login-options {
+        align-items: flex-start;
+    }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* =========================
+   REDUCE MOTION
+========================= */
 
+@media (prefers-reduced-motion: reduce) {
     .login-hero-image,
     .login-input.ant-input-affix-wrapper,
     .login-submit-btn.ant-btn,
@@ -501,3 +585,4 @@
         animation: none;
     }
 }
+

@@ -26,7 +26,7 @@ import "./Chatbot.css";
    CHATBOT API
    ============================================================ */
 
-const CHATBOT_API_BASE = "http://127.0.0.1:8001/api/chat";
+const CHATBOT_API_BASE = "https://ac56-160-250-254-31.ngrok-free.app/api/chat";
 
 const chatbotAxios = axios.create({
   baseURL: CHATBOT_API_BASE,

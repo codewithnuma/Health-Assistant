@@ -12,11 +12,14 @@
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
     "antd": "^6.6.4",
+    "axios": "^1.20.0",
     "formik": "^2.4.9",
+    "lucide-react": "^1.47.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.18.3",
+    "react-webcam": "^7.2.0",
     "remark-gfm": "^4.0.1",
     "yup": "^1.7.1"
   },

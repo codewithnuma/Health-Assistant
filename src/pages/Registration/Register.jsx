@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -8,92 +9,158 @@ const Register = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // ==========================
-  // Form Data State
-  // ==========================
+  // ============================================================
+  // FORM DATA
+  // ============================================================
+
   const [formData, setFormData] = useState({
     email: '',
     username: '',
-    Role: 'citizen', // Default role matching Django ROLES ('citizen' or 'organizer')
+    role: 'patient',
+
+    phone_number: '',
+
+    // Patient fields
     citizenship_number: '',
-    ngo_number: '',
-    password1: '',
+    citizenship_front: null,
+    citizenship_back: null,
+
+    // Pharmacy fields
+    pharmacy_license_number: '',
+    pharmacy_license_document: null,
+
+    // Password
+    password: '',
     password2: '',
   });
 
-  // ==========================
-  // Component States
-  // ==========================
+  // ============================================================
+  // COMPONENT STATES
+  // ============================================================
+
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [loading2, setLoading] = useState(false);
 
-  // ==========================
-  // Auth Loading
-  // ==========================
+  // ============================================================
+  // AUTH LOADING
+  // ============================================================
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
-  // ==========================
-  // Already Logged In Redirect
-  // ==========================
+  // ============================================================
+  // ALREADY LOGGED IN
+  // ============================================================
+
   if (user) {
     return <Navigate to="/" replace />;
   }
 
-  // ==========================
-  // Client-Side Validation
-  // ==========================
+  // ============================================================
+  // FORM VALIDATION
+  // ============================================================
+
   const validateForm = () => {
     const newErrors = {};
 
+    // ----------------------------------------------------------
     // Email
+    // ----------------------------------------------------------
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email.trim())) {
       newErrors.email = 'Email address is invalid';
     }
 
+    // ----------------------------------------------------------
     // Username
+    // ----------------------------------------------------------
+
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
     } else if (formData.username.trim().length < 3) {
       newErrors.username = 'Username must be at least 3 characters';
     }
 
-    // Conditional ID validation based on Selected Role
-    if (formData.Role === 'citizen') {
+    // ----------------------------------------------------------
+    // PHONE - OPTIONAL IN BACKEND
+    // ----------------------------------------------------------
+
+    // Phone is optional according to the backend,
+    // so we don't make it required here.
+
+    // ==========================================================
+    // PATIENT VALIDATION
+    // ==========================================================
+
+    if (formData.role === 'patient') {
       if (!formData.citizenship_number.trim()) {
-        newErrors.citizenship_number = 'Citizenship number is required';
+        newErrors.citizenship_number =
+          'Citizenship number is required';
       }
-    } else if (formData.Role === 'organizer') {
-      if (!formData.ngo_number.trim()) {
-        newErrors.ngo_number = 'NGO number is required';
+
+      if (!formData.citizenship_front) {
+        newErrors.citizenship_front =
+          'Front citizenship photo is required';
+      }
+
+      if (!formData.citizenship_back) {
+        newErrors.citizenship_back =
+          'Back citizenship photo is required';
       }
     }
 
-    // Password
-    if (!formData.password1) {
-      newErrors.password1 = 'Password is required';
-    } else if (formData.password1.length < 4) {
-      newErrors.password1 = 'Password must be at least 4 characters';
+    // ==========================================================
+    // PHARMACY VALIDATION
+    // ==========================================================
+
+    if (formData.role === 'pharmacy') {
+      if (!formData.pharmacy_license_number.trim()) {
+        newErrors.pharmacy_license_number =
+          'Pharmacy licence number is required';
+      }
+
+      if (!formData.pharmacy_license_document) {
+        newErrors.pharmacy_license_document =
+          'Pharmacy licence document is required';
+      }
     }
 
-    // Confirm Password
+    // ----------------------------------------------------------
+    // PASSWORD
+    // ----------------------------------------------------------
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password =
+        'Password must be at least 6 characters';
+    }
+
+    // ----------------------------------------------------------
+    // CONFIRM PASSWORD
+    // ----------------------------------------------------------
+
     if (!formData.password2) {
-      newErrors.password2 = 'Confirm password is required';
-    } else if (formData.password1 !== formData.password2) {
-      newErrors.password2 = 'Passwords do not match';
+      newErrors.password2 =
+        'Confirm password is required';
+    } else if (formData.password !== formData.password2) {
+      newErrors.password2 =
+        'Passwords do not match';
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
-  // ==========================
-  // Field Change Handler
-  // ==========================
+  // ============================================================
+  // NORMAL INPUT CHANGE
+  // ============================================================
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
 
@@ -102,7 +169,7 @@ const Register = () => {
       [name]: value,
     }));
 
-    // Clear active error for edited field
+    // Clear field error
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -110,7 +177,7 @@ const Register = () => {
       }));
     }
 
-    // Clear general alert error
+    // Clear general error
     if (errors.general) {
       setErrors((prev) => ({
         ...prev,
@@ -118,101 +185,331 @@ const Register = () => {
       }));
     }
 
+    // Clear success message
     if (successMessage) {
       setSuccessMessage('');
     }
   };
 
-  // ==========================
-  // Submit Handler
-  // ==========================
+  // ============================================================
+  // ROLE CHANGE
+  // ============================================================
+
+  const handleRoleChange = (e) => {
+    const newRole = e.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      role: newRole,
+
+      // Clear patient fields when switching to pharmacy
+      citizenship_number:
+        newRole === 'pharmacy'
+          ? ''
+          : prev.citizenship_number,
+
+      citizenship_front:
+        newRole === 'pharmacy'
+          ? null
+          : prev.citizenship_front,
+
+      citizenship_back:
+        newRole === 'pharmacy'
+          ? null
+          : prev.citizenship_back,
+
+      // Clear pharmacy fields when switching to patient
+      pharmacy_license_number:
+        newRole === 'patient'
+          ? ''
+          : prev.pharmacy_license_number,
+
+      pharmacy_license_document:
+        newRole === 'patient'
+          ? null
+          : prev.pharmacy_license_document,
+    }));
+
+    // Clear role-specific errors
+    setErrors((prev) => ({
+      ...prev,
+      role: '',
+      citizenship_number: '',
+      citizenship_front: '',
+      citizenship_back: '',
+      pharmacy_license_number: '',
+      pharmacy_license_document: '',
+      general: '',
+    }));
+
+    setSuccessMessage('');
+  };
+
+  // ============================================================
+  // FILE CHANGE
+  // ============================================================
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+
+    const file = files && files.length > 0
+      ? files[0]
+      : null;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: file,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
+
+    if (errors.general) {
+      setErrors((prev) => ({
+        ...prev,
+        general: '',
+      }));
+    }
+
+    setSuccessMessage('');
+  };
+
+  // ============================================================
+  // REGISTER
+  // ============================================================
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setLoading(true);
     setErrors({});
     setSuccessMessage('');
 
-    // Payload mapped to support Django model standards
-    const payload = {
-      email: formData.email.trim().toLowerCase(),
-      username: formData.username.trim(),
-      Role: formData.Role, // Capitalized 'Role' matching Django User model field
-      password: formData.password1,
-      password1: formData.password1,
-      password2: formData.password2,
-      confirm_password: formData.password2,
-    };
-
-    // Attach conditional identification mapped to backend database fields
-    if (formData.Role === 'citizen') {
-      payload.citizenship_number = formData.citizenship_number.trim();
-      payload.pan_number = null;
-    } else if (formData.Role === 'organizer') {
-      // Mapping 'ngo_number' input directly to Django's 'pan_number' field
-      payload.pan_number = formData.ngo_number.trim();
-      payload.citizenship_number = null;
-    }
-
     try {
-      const response = await axiosInstance.post('/accounts/register/', payload);
+      // ========================================================
+      // IMPORTANT:
+      // Backend has ImageField/FileField, therefore we use
+      // multipart/form-data through FormData.
+      // ========================================================
 
-      setSuccessMessage(
-        response.data?.message || 'Registration successful! Redirecting to login...'
+      const payload = new FormData();
+
+      // --------------------------------------------------------
+      // COMMON FIELDS
+      // --------------------------------------------------------
+
+      payload.append(
+        'email',
+        formData.email.trim().toLowerCase()
       );
 
-      // Reset Form State
+      payload.append(
+        'username',
+        formData.username.trim()
+      );
+
+      payload.append(
+        'role',
+        formData.role
+      );
+
+      payload.append(
+        'password',
+        formData.password
+      );
+
+      // Phone is optional, so only send it if entered
+      if (formData.phone_number.trim()) {
+        payload.append(
+          'phone_number',
+          formData.phone_number.trim()
+        );
+      }
+
+      // ========================================================
+      // PATIENT
+      // ========================================================
+
+      if (formData.role === 'patient') {
+        payload.append(
+          'citizenship_number',
+          formData.citizenship_number.trim()
+        );
+
+        payload.append(
+          'citizenship_front',
+          formData.citizenship_front
+        );
+
+        payload.append(
+          'citizenship_back',
+          formData.citizenship_back
+        );
+      }
+
+      // ========================================================
+      // PHARMACY
+      // ========================================================
+
+      if (formData.role === 'pharmacy') {
+        payload.append(
+          'pharmacy_license_number',
+          formData.pharmacy_license_number.trim()
+        );
+
+        payload.append(
+          'pharmacy_license_document',
+          formData.pharmacy_license_document
+        );
+      }
+
+      // ========================================================
+      // HIT BACKEND REGISTRATION API
+      // ========================================================
+
+      const response = await axiosInstance.post(
+        '/accounts/register/',
+        payload
+      );
+
+      console.log(
+        'Registration successful:',
+        response.data
+      );
+
+      setSuccessMessage(
+        response.data?.message ||
+          'Registration submitted successfully! Your account is waiting for admin approval.'
+      );
+
+      // ========================================================
+      // RESET FORM
+      // ========================================================
+
       setFormData({
         email: '',
         username: '',
-        Role: 'citizen',
+        role: 'patient',
+
+        phone_number: '',
+
         citizenship_number: '',
-        ngo_number: '',
-        password1: '',
+        citizenship_front: null,
+        citizenship_back: null,
+
+        pharmacy_license_number: '',
+        pharmacy_license_document: null,
+
+        password: '',
         password2: '',
       });
 
-      // Redirect to login page after 2 seconds
+      // ========================================================
+      // REDIRECT TO LOGIN
+      // ========================================================
+
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 2500);
 
     } catch (error) {
-      console.error('Registration API Error:', error.response?.data);
+      console.error(
+        'Registration API Error:',
+        error.response?.data || error
+      );
 
-      const data = error.response?.data;
+      const data = error.response?.data || {};
 
-      // Capture Django REST Framework field validation errors
+      // ========================================================
+      // HANDLE DJANGO REST FRAMEWORK ERRORS
+      // ========================================================
+
       setErrors({
-        email: data?.email?.[0] || '',
-        username: data?.username?.[0] || '',
-        citizenship_number: data?.citizenship_number?.[0] || '',
-        ngo_number: data?.pan_number?.[0] || data?.ngo_number?.[0] || '', // Map error back to ngo_number UI field
-        password1: data?.password?.[0] || data?.password1?.[0] || '',
-        password2: data?.confirm_password?.[0] || data?.password2?.[0] || data?.non_field_errors?.[0] || '',
+        email:
+          data?.email?.[0] || '',
+
+        username:
+          data?.username?.[0] || '',
+
+        role:
+          data?.role?.[0] || '',
+
+        phone_number:
+          data?.phone_number?.[0] || '',
+
+        citizenship_number:
+          data?.citizenship_number?.[0] || '',
+
+        citizenship_front:
+          data?.citizenship_front?.[0] || '',
+
+        citizenship_back:
+          data?.citizenship_back?.[0] || '',
+
+        pharmacy_license_number:
+          data?.pharmacy_license_number?.[0] || '',
+
+        pharmacy_license_document:
+          data?.pharmacy_license_document?.[0] || '',
+
+        password:
+          data?.password?.[0] || '',
+
+        password2:
+          data?.password2?.[0] ||
+          data?.confirm_password?.[0] ||
+          data?.non_field_errors?.[0] ||
+          '',
+
         general:
           data?.detail ||
           data?.error ||
-          (typeof data === 'string' ? data : null) ||
-          'Registration failed. Please check your credentials and try again.',
+          data?.non_field_errors?.[0] ||
+          (typeof data === 'string'
+            ? data
+            : '') ||
+          'Registration failed. Please check the information you entered.',
       });
+
     } finally {
       setLoading(false);
     }
   };
 
+  // ============================================================
+  // RENDER
+  // ============================================================
+
   return (
     <div className="register-container">
       <div className="register-card">
-        <h1 className="register-title">Welcome to Hamro Nepal</h1>
+
+        <h1 className="register-title">
+          Welcome to Hamro Nepal
+        </h1>
+
         <p className="register-subtitle">
           Create an account to access portal services
         </p>
 
-        <form onSubmit={handleRegister} className="register-form">
-          {/* SUCCESS MESSAGE ALERT */}
+        <form
+          onSubmit={handleRegister}
+          className="register-form"
+          encType="multipart/form-data"
+        >
+
+          {/* ================================================== */}
+          {/* SUCCESS MESSAGE */}
+          {/* ================================================== */}
+
           {successMessage && (
             <div className="success-message">
               <span className="success-icon">✓</span>
@@ -220,12 +517,25 @@ const Register = () => {
             </div>
           )}
 
-          {/* GENERAL ERROR ALERT */}
-          {errors.general && <div className="error-message">{errors.general}</div>}
+          {/* ================================================== */}
+          {/* GENERAL ERROR */}
+          {/* ================================================== */}
 
+          {errors.general && (
+            <div className="error-message">
+              {errors.general}
+            </div>
+          )}
+
+          {/* ================================================== */}
           {/* EMAIL */}
+          {/* ================================================== */}
+
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">
+              Email Address
+            </label>
+
             <input
               id="email"
               type="email"
@@ -233,14 +543,29 @@ const Register = () => {
               placeholder="you@example.com"
               value={formData.email}
               onChange={handleFormChange}
-              className={errors.email ? 'input-error' : ''}
+              className={
+                errors.email
+                  ? 'input-error'
+                  : ''
+              }
             />
-            {errors.email && <span className="field-error">{errors.email}</span>}
+
+            {errors.email && (
+              <span className="field-error">
+                {errors.email}
+              </span>
+            )}
           </div>
 
+          {/* ================================================== */}
           {/* USERNAME */}
+          {/* ================================================== */}
+
           <div className="form-group">
-            <label htmlFor="username">Username/Organization</label>
+            <label htmlFor="username">
+              Username
+            </label>
+
             <input
               id="username"
               type="text"
@@ -248,81 +573,304 @@ const Register = () => {
               placeholder="Choose a username"
               value={formData.username}
               onChange={handleFormChange}
-              className={errors.username ? 'input-error' : ''}
+              className={
+                errors.username
+                  ? 'input-error'
+                  : ''
+              }
             />
-            {errors.username && <span className="field-error">{errors.username}</span>}
+
+            {errors.username && (
+              <span className="field-error">
+                {errors.username}
+              </span>
+            )}
           </div>
 
-          {/* ROLE DROPDOWN SELECTOR */}
+          {/* ================================================== */}
+          {/* PHONE */}
+          {/* ================================================== */}
+
           <div className="form-group">
-            <label htmlFor="Role">Account Role</label>
-            <select
-              id="Role"
-              name="Role"
-              value={formData.Role}
-              onChange={handleFormChange}
-            >
-              <option value="citizen">Citizen</option>
-              <option value="organizer">Organization / NGO</option>
-            </select>
-          </div>
+            <label htmlFor="phone_number">
+              Phone Number
+              <span className="optional-label">
+                {' '} (Optional)
+              </span>
+            </label>
 
-          {/* CONDITIONAL INPUT: CITIZENSHIP NUMBER */}
-          {formData.Role === 'citizen' && (
-            <div className="form-group">
-              <label htmlFor="citizenship_number">Citizenship Number</label>
-              <input
-                id="citizenship_number"
-                type="text"
-                name="citizenship_number"
-                placeholder="Enter citizenship number"
-                value={formData.citizenship_number}
-                onChange={handleFormChange}
-                className={errors.citizenship_number ? 'input-error' : ''}
-              />
-              {errors.citizenship_number && (
-                <span className="field-error">{errors.citizenship_number}</span>
-              )}
-            </div>
-          )}
-
-          {/* CONDITIONAL INPUT: NGO NUMBER */}
-          {formData.Role === 'organizer' && (
-            <div className="form-group">
-              <label htmlFor="ngo_number">NGO Registration Number</label>
-              <input
-                id="ngo_number"
-                type="text"
-                name="ngo_number"
-                placeholder="Enter NGO registration number"
-                value={formData.ngo_number}
-                onChange={handleFormChange}
-                className={errors.ngo_number ? 'input-error' : ''}
-              />
-              {errors.ngo_number && (
-                <span className="field-error">{errors.ngo_number}</span>
-              )}
-            </div>
-          )}
-
-          {/* PASSWORD */}
-          <div className="form-group">
-            <label htmlFor="password1">Password</label>
             <input
-              id="password1"
-              type="password"
-              name="password1"
-              placeholder="Enter password"
-              value={formData.password1}
+              id="phone_number"
+              type="tel"
+              name="phone_number"
+              placeholder="Enter phone number"
+              value={formData.phone_number}
               onChange={handleFormChange}
-              className={errors.password1 ? 'input-error' : ''}
+              className={
+                errors.phone_number
+                  ? 'input-error'
+                  : ''
+              }
             />
-            {errors.password1 && <span className="field-error">{errors.password1}</span>}
+
+            {errors.phone_number && (
+              <span className="field-error">
+                {errors.phone_number}
+              </span>
+            )}
           </div>
 
-          {/* CONFIRM PASSWORD */}
+          {/* ================================================== */}
+          {/* ROLE */}
+          {/* ================================================== */}
+
           <div className="form-group">
-            <label htmlFor="password2">Confirm Password</label>
+            <label htmlFor="role">
+              Account Role
+            </label>
+
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleRoleChange}
+              className={
+                errors.role
+                  ? 'input-error'
+                  : ''
+              }
+            >
+              <option value="patient">
+                Patient
+              </option>
+
+              <option value="pharmacy">
+                Pharmacy
+              </option>
+            </select>
+
+            {errors.role && (
+              <span className="field-error">
+                {errors.role}
+              </span>
+            )}
+          </div>
+
+          {/* ================================================== */}
+          {/* PATIENT ONLY */}
+          {/* ================================================== */}
+
+          {formData.role === 'patient' && (
+            <>
+              {/* Citizenship Number */}
+
+              <div className="form-group">
+                <label htmlFor="citizenship_number">
+                  Citizenship Number
+                </label>
+
+                <input
+                  id="citizenship_number"
+                  type="text"
+                  name="citizenship_number"
+                  placeholder="Enter citizenship number"
+                  value={formData.citizenship_number}
+                  onChange={handleFormChange}
+                  className={
+                    errors.citizenship_number
+                      ? 'input-error'
+                      : ''
+                  }
+                />
+
+                {errors.citizenship_number && (
+                  <span className="field-error">
+                    {errors.citizenship_number}
+                  </span>
+                )}
+              </div>
+
+              {/* Citizenship Front */}
+
+              <div className="form-group">
+                <label htmlFor="citizenship_front">
+                  Citizenship Front Photo
+                </label>
+
+                <input
+                  id="citizenship_front"
+                  type="file"
+                  name="citizenship_front"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className={
+                    errors.citizenship_front
+                      ? 'input-error'
+                      : ''
+                  }
+                />
+
+                {formData.citizenship_front && (
+                  <small>
+                    Selected:{' '}
+                    {formData.citizenship_front.name}
+                  </small>
+                )}
+
+                {errors.citizenship_front && (
+                  <span className="field-error">
+                    {errors.citizenship_front}
+                  </span>
+                )}
+              </div>
+
+              {/* Citizenship Back */}
+
+              <div className="form-group">
+                <label htmlFor="citizenship_back">
+                  Citizenship Back Photo
+                </label>
+
+                <input
+                  id="citizenship_back"
+                  type="file"
+                  name="citizenship_back"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className={
+                    errors.citizenship_back
+                      ? 'input-error'
+                      : ''
+                  }
+                />
+
+                {formData.citizenship_back && (
+                  <small>
+                    Selected:{' '}
+                    {formData.citizenship_back.name}
+                  </small>
+                )}
+
+                {errors.citizenship_back && (
+                  <span className="field-error">
+                    {errors.citizenship_back}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ================================================== */}
+          {/* PHARMACY ONLY */}
+          {/* ================================================== */}
+
+          {formData.role === 'pharmacy' && (
+            <>
+              {/* Pharmacy Licence Number */}
+
+              <div className="form-group">
+                <label htmlFor="pharmacy_license_number">
+                  Pharmacy Licence Number
+                </label>
+
+                <input
+                  id="pharmacy_license_number"
+                  type="text"
+                  name="pharmacy_license_number"
+                  placeholder="Enter pharmacy licence number"
+                  value={
+                    formData.pharmacy_license_number
+                  }
+                  onChange={handleFormChange}
+                  className={
+                    errors.pharmacy_license_number
+                      ? 'input-error'
+                      : ''
+                  }
+                />
+
+                {errors.pharmacy_license_number && (
+                  <span className="field-error">
+                    {errors.pharmacy_license_number}
+                  </span>
+                )}
+              </div>
+
+              {/* Pharmacy Licence Document */}
+
+              <div className="form-group">
+                <label htmlFor="pharmacy_license_document">
+                  Pharmacy Licence Document
+                </label>
+
+                <input
+                  id="pharmacy_license_document"
+                  type="file"
+                  name="pharmacy_license_document"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                  className={
+                    errors.pharmacy_license_document
+                      ? 'input-error'
+                      : ''
+                  }
+                />
+
+                {formData.pharmacy_license_document && (
+                  <small>
+                    Selected:{' '}
+                    {formData.pharmacy_license_document.name}
+                  </small>
+                )}
+
+                {errors.pharmacy_license_document && (
+                  <span className="field-error">
+                    {errors.pharmacy_license_document}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ================================================== */}
+          {/* PASSWORD */}
+          {/* ================================================== */}
+
+          <div className="form-group">
+            <label htmlFor="password">
+              Password
+            </label>
+
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={handleFormChange}
+              className={
+                errors.password
+                  ? 'input-error'
+                  : ''
+              }
+            />
+
+            {errors.password && (
+              <span className="field-error">
+                {errors.password}
+              </span>
+            )}
+          </div>
+
+          {/* ================================================== */}
+          {/* CONFIRM PASSWORD */}
+          {/* ================================================== */}
+
+          <div className="form-group">
+            <label htmlFor="password2">
+              Confirm Password
+            </label>
+
             <input
               id="password2"
               type="password"
@@ -330,24 +878,43 @@ const Register = () => {
               placeholder="Confirm password"
               value={formData.password2}
               onChange={handleFormChange}
-              className={errors.password2 ? 'input-error' : ''}
+              className={
+                errors.password2
+                  ? 'input-error'
+                  : ''
+              }
             />
-            {errors.password2 && <span className="field-error">{errors.password2}</span>}
+
+            {errors.password2 && (
+              <span className="field-error">
+                {errors.password2}
+              </span>
+            )}
           </div>
 
-          {/* SUBMIT BUTTON */}
+          {/* ================================================== */}
+          {/* SUBMIT */}
+          {/* ================================================== */}
+
           <button
             type="submit"
             className="btn btn-primary btn-block"
             disabled={loading2}
           >
-            {loading2 ? 'Creating Account...' : 'Create Account'}
+            {loading2
+              ? 'Submitting Registration...'
+              : 'Create Account'}
           </button>
+
         </form>
 
+        {/* ==================================================== */}
         {/* FOOTER */}
+        {/* ==================================================== */}
+
         <div className="register-footer">
           Already have an account?{' '}
+
           <button
             type="button"
             className="login-link"
@@ -356,9 +923,11 @@ const Register = () => {
             Sign In
           </button>
         </div>
+
       </div>
     </div>
   );
 };
 
 export default Register;
+

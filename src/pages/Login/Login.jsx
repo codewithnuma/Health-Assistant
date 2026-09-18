@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -61,7 +62,9 @@ const Login = () => {
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setActiveStory((current) => (current + 1) % disasterStories.length)
+      setActiveStory(
+        (current) => (current + 1) % disasterStories.length
+      )
     }, 5500)
 
     return () => window.clearInterval(timer)
@@ -87,10 +90,13 @@ const Login = () => {
       setLoading(true)
 
       try {
-        const result = await login(values.email, values.password)
+        const result = await login(
+          values.email,
+          values.password
+        )
 
         if (!result.success) {
-          message.error(result.error)
+          message.error(result.error || "Login failed")
           return
         }
 
@@ -101,26 +107,38 @@ const Login = () => {
           return
         }
 
+        const role = String(
+          loggedInUser.role ||
+            loggedInUser.Role ||
+            ""
+        ).toLowerCase()
+
+        console.log("Logged in user:", loggedInUser)
+        console.log("User role:", role)
+
         message.success("Login successful!")
 
-        const role = (
-          loggedInUser.role ||
-          loggedInUser.Role ||
-          "citizen"
-        )
-          .toString()
-          .toLowerCase()
+        // Backend roles:
+        // admin
+        // pharmacy
+        // patient
 
-        if (["admin", "organizer", "employee"].includes(role)) {
+        if (role === "admin" || role === "pharmacy") {
           navigate("/dashboard", { replace: true })
-        } else if (["citizen", "user"].includes(role)) {
+        } else if (role === "patient") {
           navigate("/user-dashboard", { replace: true })
         } else {
-          navigate("/", { replace: true })
+          console.error("Unknown user role:", role)
+          message.error(
+            `Unknown account role: ${role || "none"}`
+          )
         }
       } catch (error) {
-        console.error(error)
-        message.error("Invalid email or password")
+        console.error("Login error:", error)
+        message.error(
+          error?.response?.data?.detail ||
+            "Invalid email or password"
+        )
       } finally {
         setLoading(false)
       }
@@ -128,14 +146,19 @@ const Login = () => {
   })
 
   const getFieldStatus = (field) =>
-    formik.touched[field] && formik.errors[field] ? "error" : undefined
+    formik.touched[field] && formik.errors[field]
+      ? "error"
+      : undefined
 
   const story = disasterStories[activeStory]
 
   return (
     <main className="login-page">
+
+      {/* LEFT SIDE */}
       <section className="login-left">
         <div className="login-form-container">
+
           <div className="login-brand">
             <div className="login-logo">
               <BookOutlined />
@@ -147,15 +170,17 @@ const Login = () => {
           </div>
 
           <div className="login-heading">
-            <p className="login-kicker">Welcome back</p>
+            <p className="login-kicker">
+              Welcome back
+            </p>
 
             <h1 className="login-title">
               Log in to make a difference.
             </h1>
 
             <p className="login-subtitle">
-              Sign in to manage your Hamro Nepal account and stay connected
-              to your community.
+              Sign in to manage your Hamro Nepal account
+              and stay connected to your community.
             </p>
           </div>
 
@@ -164,6 +189,7 @@ const Login = () => {
             onFinish={formik.handleSubmit}
             className="login-form"
           >
+
             <Form.Item
               label={
                 <span className="login-label">
@@ -172,7 +198,8 @@ const Login = () => {
               }
               validateStatus={getFieldStatus("email")}
               help={
-                formik.touched.email && formik.errors.email
+                formik.touched.email &&
+                formik.errors.email
               }
             >
               <Input
@@ -181,7 +208,6 @@ const Login = () => {
                 prefix={
                   <MailOutlined className="login-input-icon" />
                 }
-                size="large"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -197,7 +223,8 @@ const Login = () => {
               }
               validateStatus={getFieldStatus("password")}
               help={
-                formik.touched.password && formik.errors.password
+                formik.touched.password &&
+                formik.errors.password
               }
             >
               <Input.Password
@@ -206,7 +233,6 @@ const Login = () => {
                 prefix={
                   <LockOutlined className="login-input-icon" />
                 }
-                size="large"
                 iconRender={(visible) =>
                   visible ? (
                     <EyeTwoTone />
@@ -222,6 +248,7 @@ const Login = () => {
             </Form.Item>
 
             <div className="login-options">
+
               <Checkbox
                 checked={rememberMe}
                 onChange={(event) =>
@@ -238,13 +265,13 @@ const Login = () => {
               >
                 Forgot password?
               </Link>
+
             </div>
 
             <Button
               type="primary"
               htmlType="submit"
               block
-              size="large"
               loading={loading}
               className="login-submit-btn"
             >
@@ -253,20 +280,28 @@ const Login = () => {
             </Button>
 
             <div className="login-signup-link">
-              <span>Don&apos;t have an account? </span>
+              <span>
+                Don't have an account?{" "}
+              </span>
 
-              <Link to="/Signup" className="login-link">
+              <Link
+                to="/signup"
+                className="login-link"
+              >
                 Sign up
               </Link>
             </div>
+
           </Form>
         </div>
       </section>
 
+      {/* RIGHT SIDE */}
       <section
         className="login-right"
         aria-label="Hamro Nepal stories"
       >
+
         {disasterStories.map((item, index) => (
           <img
             key={item.image}
@@ -281,6 +316,7 @@ const Login = () => {
         <div className="login-image-overlay" />
 
         <div className="login-image-content">
+
           <div className="login-story-eyebrow">
             <span className="login-live-dot" />
             {story.eyebrow}
@@ -295,7 +331,9 @@ const Login = () => {
           </p>
 
           <div className="login-image-footer">
+
             <div className="login-image-stats">
+
               <div className="login-stat">
                 <span className="login-stat-number">
                   50K+
@@ -326,6 +364,7 @@ const Login = () => {
                   Reports
                 </span>
               </div>
+
             </div>
 
             <div
@@ -338,14 +377,18 @@ const Login = () => {
                   key={item.eyebrow}
                   aria-label={`Show ${item.eyebrow}`}
                   className={
-                    index === activeStory ? "is-active" : ""
+                    index === activeStory
+                      ? "is-active"
+                      : ""
                   }
                   onClick={() => setActiveStory(index)}
                 />
               ))}
             </div>
+
           </div>
         </div>
+
       </section>
     </main>
   )
