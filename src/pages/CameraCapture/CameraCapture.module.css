@@ -1,0 +1,425 @@
+/* Page Layout */
+.container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 8px 16px 48px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1d1d1f;
+}
+
+/* Header */
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #86868b;
+  margin: 0;
+}
+
+/* Mode Switcher Tabs */
+.tabGroup {
+  display: inline-flex;
+  background-color: #e5e5ea;
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 20px;
+  gap: 2px;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #636366;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabBtnActive {
+  background-color: #ffffff;
+  color: #1d1d1f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Card Shell */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e5ea;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  padding: 24px;
+}
+
+/* Viewport Area (Camera / Preview) */
+.viewportContainer {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
+  background-color: #000000;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.webcam {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Viewfinder Overlay Frame */
+.viewfinderOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guideFrame {
+  position: relative;
+  width: 82%;
+  height: 82%;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+}
+
+/* Corner Accents */
+.cornerTL, .cornerTR, .cornerBL, .cornerBR {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #0071e3;
+  border-style: solid;
+}
+
+.cornerTL {
+  top: -2px;
+  left: -2px;
+  border-width: 4px 0 0 4px;
+  border-top-left-radius: 12px;
+}
+
+.cornerTR {
+  top: -2px;
+  right: -2px;
+  border-width: 4px 4px 0 0;
+  border-top-right-radius: 12px;
+}
+
+.cornerBL {
+  bottom: -2px;
+  left: -2px;
+  border-width: 0 0 4px 4px;
+  border-bottom-left-radius: 12px;
+}
+
+.cornerBR {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 4px 4px 0;
+  border-bottom-right-radius: 12px;
+}
+
+.frameHint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* Camera Action Bar */
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.snapButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #0071e3;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+  box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
+}
+
+.snapButton:hover {
+  background-color: #0077ed;
+  transform: scale(1.02);
+}
+
+.snapButton:active {
+  transform: scale(0.98);
+}
+
+.secondaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f5f5f7;
+  color: #1d1d1f;
+  border: 1px solid #d2d2d7;
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.secondaryBtn:hover {
+  background-color: #e8e8ed;
+}
+
+/* Fallback Upload Box */
+.dropZone {
+  border: 2px dashed #d2d2d7;
+  border-radius: 14px;
+  background-color: #fbfbfd;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropZone:hover {
+  border-color: #0071e3;
+  background-color: #f0f7ff;
+}
+
+.dropZoneIcon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: #eaf2fd;
+  color: #0071e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.dropZoneTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 6px;
+}
+
+.dropZoneHint {
+  font-size: 13px;
+  color: #86868b;
+  margin: 0;
+}
+
+/* Hidden input element */
+.hiddenInput {
+  display: none;
+}
+
+/* Preview Mode */
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #1c1c1e;
+}
+
+/* PDF Preview Card */
+.pdfPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  gap: 12px;
+  padding: 24px;
+}
+
+.pdfIcon {
+  color: #ff3b30;
+}
+
+.pdfName {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  max-width: 80%;
+  word-break: break-all;
+}
+
+.pdfSize {
+  font-size: 12px;
+  color: #86868b;
+}
+
+/* Blurriness Warning / Quality check notice */
+.qualityNotice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fff8e6;
+  border: 1px solid #ffd591;
+  color: #874d00;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-top: 18px;
+}
+
+/* Preview Actions */
+.previewActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e5ea;
+}
+
+.retakeBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #ff3b30;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.retakeBtn:hover {
+  background-color: #fff5f5;
+  border-color: #ff3b30;
+}
+
+.confirmGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f5f7;
+  color: #1d1d1f;
+  border: 1px solid #e5e5ea;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.downloadBtn:hover {
+  background-color: #e8e8ed;
+}
+
+.proceedBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #34c759;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.proceedBtn:hover {
+  background-color: #2fb350;
+}
+
+/* Metadata chip */
+.metadataChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: #f5f5f7;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #636366;
+  margin-top: 12px;
+}
+
+/* Error State */
+.errorCard {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  color: #cf1322;
+  margin-bottom: 20px;
+}
+
+.errorTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.errorText {
+  font-size: 13px;
+  color: #595959;
+  margin: 0 0 16px;
+}
+
